@@ -1,0 +1,58 @@
+const int Conditioner = A0;    // pin that the conditioner is attached to
+const int ledPin = 13;       // pin that the arduino LED is attached to
+const int external_red = 9;       // pin that the external_red LED is attached to
+const int relay_1 = 10;       // pin that the one channel relay is attached to
+const int spec_weight = 125;   // an arbitrary value that's in the range of the analog input
+const int blue_button_switch = 2;       // pin that the blue_button_switch is attached to
+int blue_buttonState = 0;                // variable for reading the blue_button_switch status
+
+boolean flag9 = true;                    // enable/disable flag
+
+void setup() {  
+  // initialize the LED pin as an output:
+  pinMode(ledPin, OUTPUT);
+  // initialize the relay pin as an output:
+  pinMode(relay_1, OUTPUT);
+  // initialize the external_red pin as an output:
+  pinMode(external_red, OUTPUT);
+   // initialize the blue_button_switch pin as an input:
+  pinMode(blue_button_switch, INPUT);
+  // initialize serial communications:
+  Serial.begin(9600);
+}
+
+void loop() {
+  // read the value of the conditioner:
+  int analogValue = analogRead(Conditioner);
+
+  // if the analog value is high enough, turn on the arduino LED and trigger the relay:
+  if (analogValue >= spec_weight) {
+    digitalWrite(ledPin, HIGH);         // sets the arduino LED on
+    digitalWrite(relay_1, HIGH);        // triggers the channel one relay
+  }/* else {
+    digitalWrite(ledPin, LOW);
+    digitalWrite(relay_1, LOW);
+  }*/
+  
+  // when the analog value is high enough, cause the external_red led to blink until blue_button_switch is pressed:
+  while (analogValue >= spec_weight) {
+    blue_buttonState = digitalRead(blue_button_switch);
+    // if the blue_button_switch has not been pressed, cause external_led to blink:
+    if (flag9 == true && blue_buttonState == HIGH){
+      digitalWrite(external_red, HIGH);   // sets the external_red LED on
+      delay(50);                         // waits for a second
+      digitalWrite(external_red, LOW);    // sets the external_red LED off
+      delay(50);                         // waits for a second
+    } 
+    //if the blue_button_switch is pressed, cause external_led to stop blinking and remain on: 
+    else{
+      digitalWrite(external_red, HIGH);   // sets the external_red LED on
+      flag9 = false;                    // disables further pin 9 control
+    }delay(500);
+  } 
+
+
+  // print the analog value:
+  Serial.println(analogValue);
+  delay(1);        // delay in between reads for stability
+}
