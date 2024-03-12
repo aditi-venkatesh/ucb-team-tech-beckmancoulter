@@ -1,0 +1,24 @@
+from gpiozero import LED, Button
+from time import sleep
+
+# Define GPIO pin numbers
+led_pin = 17  
+button_pin = 18  
+
+led = LED(led_pin)
+button = Button(button_pin)
+
+def blink_led():
+    led.on()
+    sleep(10)  
+    led.off()  
+
+button.when_pressed = blink_led
+
+# Keep the program running to wait for button presses
+try:
+    while True:
+        sleep(0.1)
+
+except KeyboardInterrupt:
+    led.off()
